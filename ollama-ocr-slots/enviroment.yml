@@ -1,0 +1,17 @@
+# ollama-ocr-slots/environment.yml
+name: ollama-ocr-env
+channels:
+    - conda-forge # Prioritize conda-forge for broader package availability and updates
+    - defaults
+dependencies:
+    - python=3.10
+    - easyocr
+    # Add other core Python libraries your AI/OCR code directly uses here:
+    # - numpy
+    # - pandas
+    # - pytorch # If using PyTorch (EasyOCR can use it)
+    # - opencv # If using OpenCV (EasyOCR can use it)
+    - pip
+    - pip:
+      # List any packages here that are *only* available via pip
+      # - some-pypi-only-package==1.2.3

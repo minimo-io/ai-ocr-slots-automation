@@ -1,0 +1,65 @@
+# General ignores for various OS and IDEs
+.DS_Store
+Thumbs.db
+.vscode/    # VS Code workspace settings
+.idea/      # IntelliJ/PyCharm IDE files
+*.iml       # IntelliJ IDEA module files
+.project    # Eclipse project files
+.classpath  # Eclipse classpath files
+.settings/  # Eclipse settings directory
+
+# Environment variables files (applies to .env in any directory)
+.env
+
+# --- Python / Conda specific ignores ---
+# Compiled Python files (anywhere in the repo)
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual environments (anywhere in the repo)
+**/venv/
+**/.venv/
+
+# Conda environment directories (if explicitly created within any project subfolder)
+# Uncomment these if you typically create Conda envs directly inside project directories.
+# **/envs/
+# **/.conda/
+
+# Jupyter Notebook specific files (anywhere in the repo)
+**/.ipynb_checkpoints/
+
+# Pytest cache directory (anywhere in the repo)
+**/.pytest_cache/
+
+# Configuration files (if not meant to be version controlled, e.g., for local settings)
+*.ini
+
+# Generated output/data directories (anywhere in the repo)
+**/output/
+**/results/
+**/data/generated/
+
+
+# --- Node.js / npm specific ignores ---
+# Node modules directory (anywhere in the repo)
+**/node_modules/
+
+# npm debug logs and cache directories (anywhere in the repo)
+npm-debug.log*
+yarn-debug.log*
+**/.npm/
+**/npm-cache/
+
+# Build/distribution directories (anywhere in the repo)
+**/dist/
+**/build/
+
+# --- General Output & Log Files ---
+# Log files (applies to any .log file in any directory)
+*.log
+
+# Database files (e.g., SQLite) (anywhere in the repo)
+*.sqlite3
+db.sqlite3
