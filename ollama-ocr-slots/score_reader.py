@@ -4,7 +4,6 @@ import cv2
 import easyocr
 
 # Initialize EasyOCR reader once.
-# gpu=True leverages your Mac Mini's Metal Performance Shaders (MPS) for faster processing.
 reader = easyocr.Reader(['en'], gpu=True)
 
 def read_game_score_custom_crop(image_path):
