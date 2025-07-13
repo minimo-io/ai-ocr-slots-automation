@@ -1,9 +1,7 @@
-import os, sys
+import os
 import re
 import cv2
 import easyocr
-
-
 
 
 def read_game_score_custom_crop(image_path):
@@ -166,6 +164,7 @@ if __name__ == "__main__":
     image_file = 'game_screenshot.png'
 
     # Call the function to read the score.
+    print("Firing things up...")
     score = read_game_score_custom_crop(image_file)
 
     # Print the extracted score or a failure message.
