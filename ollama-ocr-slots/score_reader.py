@@ -1,10 +1,10 @@
-import os
+import os, sys
 import re
 import cv2
 import easyocr
 
-# Initialize EasyOCR reader once.
-reader = easyocr.Reader(['en'], gpu=True)
+
+
 
 def read_game_score_custom_crop(image_path):
     """
@@ -156,8 +156,13 @@ def read_game_score_custom_crop(image_path):
         print(f"An unexpected error occurred during EasyOCR processing: {e}")
         return None
 
+
 if __name__ == "__main__":
-    # Specify the path to your game screenshot image.
+
+    # Initialize EasyOCR reader once.
+    reader = easyocr.Reader(['en'], gpu=True)
+
+    # Path to your game screenshot image.
     image_file = 'game_screenshot.png'
 
     # Call the function to read the score.
@@ -168,252 +173,3 @@ if __name__ == "__main__":
         print(f"\nExtracted Score: {score}")
     else:
         print("Failed to extract score.")
-
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------
-# import os
-# import re
-# import cv2
-# import easyocr
-
-# # Initialize EasyOCR reader once.
-# reader = easyocr.Reader(['en'], gpu=True)
-
-# def read_game_score_full_image(image_path):
-#     if not os.path.exists(image_path):
-#         print(f"Error: Image file not found at {image_path}")
-#         return None
-
-#     cv_image_original = cv2.imread(image_path)
-#     if cv_image_original is None:
-#         print(f"Error: Could not load image with OpenCV at {image_path}. Check file path and integrity.")
-#         return None
-
-#     h, w, _ = cv_image_original.shape
-#     print(f"Original image dimensions: Width={w}, Height={h}")
-
-#     print(f"Sending full image to EasyOCR for text detection and recognition: {image_path}")
-
-#     try:
-#         gray_image = cv2.cvtColor(cv_image_original, cv2.COLOR_BGR2GRAY)
-#         results = reader.readtext(gray_image, allowlist='0123456789', detail=0)
-
-#         string_results = [str(item) for item in results if isinstance(item, (str, int, float))]
-#         full_ocr_text = " ".join(string_results)
-
-#         if full_ocr_text:
-#             print(f"EasyOCR raw text from full image: '{full_ocr_text}'")
-#             all_numbers = re.findall(r'\d+', full_ocr_text)
-#             print(f"All numbers found by EasyOCR: {all_numbers}")
-
-#             # --- NEW: Filter and Prioritize Numbers ---
-#             candidate_scores = []
-#             for num_str in all_numbers:
-#                 # Example 1: Filter by a reasonable length for a game score (e.g., 1 to 7 digits)
-#                 # Adjust these bounds based on your actual game's score range (e.g., max 9,999,999)
-#                 if 1 <= len(num_str) <= 7: # Assuming scores are usually less than 8 digits long
-#                     candidate_scores.append(num_str)
-
-#                 # Example 2 (alternative/additional): Filter by value range (if applicable)
-#                 # Try converting to int and checking range.
-#                 # try:
-#                 #     num_val = int(num_str)
-#                 #     if 0 <= num_val <= 1000000: # Assuming score is between 0 and 1 Million
-#                 #         candidate_scores.append(num_str)
-#                 # except ValueError:
-#                 #     pass # Not a valid integer, ignore.
-
-#             final_score = None
-#             if candidate_scores:
-#                 # After filtering, pick the longest from the valid candidates.
-#                 # Or, if scores are usually similar lengths, you might just pick the first one.
-#                 final_score = max(candidate_scores, key=len)
-#                 print(f"Candidate Scores after filtering: {candidate_scores}")
-#             else:
-#                 print("No suitable numerical score found after filtering by length/range.")
-#                 final_score = "No suitable score found."
-
-#             return final_score
-
-#         else:
-#             print("EasyOCR found no text in the entire image.")
-#             return "No text found by EasyOCR."
-
-#     except Exception as e:
-#         print(f"An error occurred during EasyOCR processing: {e}")
-#         return None
-
-# if __name__ == "__main__":
-#     image_file = 'game_screenshot.png'
-#     score = read_game_score_full_image(image_file)
-
-#     if score is not None:
-#         print(f"\nExtracted Score: {score}")
-#     else:
-#         print("Failed to extract score.")
-# -------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# import ollama
-# import base64
-# import os
-# import re
-
-# def image_to_base64(image_path):
-#     """Converts an image file to a base64 string."""
-#     with open(image_path, "rb") as image_file:
-#         return base64.b64encode(image_file.read()).decode('utf-8')
-
-# def read_game_score(image_path):
-#     """
-#     Uses Ollama's MiniCPM-V model to read the game score from an image.
-#     """
-#     if not os.path.exists(image_path):
-#         print(f"Error: Image file not found at {image_path}")
-#         return None
-
-#     base64_image = image_to_base64(image_path)
-
-#     # --- Use a highly restrictive prompt. Try these with MiniCPM-V ---
-#     # Prompt 1 (most direct):
-#     prompt = "What is the exact numerical score shown in this game image? Respond with ONLY the digits. Do not include any words, symbols, or or punctuation whatsoever. Just the number. Example: 12345"
-
-#     # Prompt 2 (alternative wording):
-#     # prompt = "Extract the current score from this game screen. Output strictly the digits, and nothing else at all."
-
-#     # Prompt 3 (if there might be other numbers, instruct to get the main score):
-#     # prompt = "Locate the main game score in the image. This score is a sequence of digits. Output ONLY that exact sequence of digits, with no other text, words, or punctuation whatsoever."
-
-
-#     print(f"Sending image to MiniCPM-V for processing: {image_path}")
-
-#     try:
-#         response = ollama.chat(
-#             model='minicpm-v', # <--- IMPORTANT: Changed to minicpm-v
-#             messages=[
-#                 {
-#                     'role': 'user',
-#                     'content': prompt,
-#                     'images': [base64_image]
-#                 }
-#             ]
-#         )
-#         raw_response = response['message']['content'].strip()
-#         print(f"Raw MiniCPM-V response: '{raw_response}'")
-
-#         # --- Post-processing (same robust logic) ---
-#         potential_numbers = re.findall(r'[\d,.]+', raw_response)
-#         cleaned_numbers = []
-#         for num_str in potential_numbers:
-#             cleaned_num = re.sub(r'[^0-9]', '', num_str)
-#             if cleaned_num:
-#                 cleaned_numbers.append(cleaned_num)
-
-#         final_score = None
-#         if cleaned_numbers:
-#             final_score = max(cleaned_numbers, key=len) if cleaned_numbers else "No numerical score found after cleaning."
-#         else:
-#             final_score = "No numerical score found in the raw response."
-
-#         return final_score
-
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-#         return None
-
-# if __name__ == "__main__":
-#     image_file = 'game_screenshot.png' # Make sure this matches your image file name
-#     score = read_game_score(image_file)
-
-#     if score is not None:
-#         print(f"\nExtracted Score: {score}")
-#     else:
-#         print("Failed to extract score.")
-
-# ------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# import ollama
-# import base64
-# import os
-# import re
-
-# def image_to_base64(image_path):
-#     """Converts an image file to a base64 string."""
-#     with open(image_path, "rb") as image_file:
-#         return base64.b64encode(image_file.read()).decode('utf-8')
-
-# def read_game_score(image_path):
-#     """
-#     Uses Ollama's LLaVA model to read all numerical values from the image
-#     """
-#     if not os.path.exists(image_path):
-#         print(f"Error: Image file not found at {image_path}")
-#         return None
-
-#     # Convert the image to base64
-#     base64_image = image_to_base64(image_path)
-
-#     # --- REFINED PROMPT ---
-#     # Option 1: Very direct, focus on numbers only
-#     # prompt = "What is the exact numerical score in this game screenshot? Respond with ONLY the number. No words, no punctuation, just the digits."
-
-#     # Option 2: Slightly more descriptive, still aiming for pure number
-#     prompt = "Extract the numerical score from this game image. Provide only the digits, strictly no other text or symbols."
-
-
-#     # Option 3: If score is always a positive integer
-#     # prompt = "What is the current score? Give me just the positive integer number."
-
-#     print(f"Sending image to LLaVA for processing: {image_path}")
-
-#     try:
-#         response = ollama.chat(
-#             model='llava:7b',
-#             messages=[
-#                 {
-#                     'role': 'user',
-#                     'content': prompt,
-#                     'images': [base64_image]
-#                 }
-#             ]
-#         )
-#         score_text = response['message']['content'].strip()
-#         print(f"Raw LLaVA response: '{score_text}'")
-
-#         # --- MORE ROBUST POST-PROCESSING ---
-#         # Remove any non-digit characters that are not part of a number (like spaces, quotes, periods outside a number)
-#         # Find all sequences of digits, potentially separated by commas or periods
-
-#         # First, try to extract numbers that might contain commas/periods for thousands separators
-#         numbers_with_separators = re.findall(r'\d[\d,.]*', score_text) # finds '100', '1,000', '9.9' etc.
-
-#         cleaned_numbers = []
-#         for num_str in numbers_with_separators:
-#             # Remove all non-digit characters from the found number string
-#             cleaned_num = re.sub(r'[^0-9]', '', num_str)
-#             if cleaned_num: # Ensure it's not an empty string after cleaning
-#                 cleaned_numbers.append(cleaned_num)
-
-#         if cleaned_numbers:
-#             # If multiple numbers are found, you might need a more sophisticated rule.
-#             # For a simple score, often the first or the longest number is the correct one.
-#             # Here, we'll try to return the longest one, as scores tend to be the "biggest" number.
-#             return max(cleaned_numbers, key=len) if len(cleaned_numbers) > 1 else cleaned_numbers[0]
-#         else:
-#             # Fallback: if the above failed, try to just get any digits.
-#             all_digits = re.findall(r'\d+', score_text)
-#             if all_digits:
-#                 return max(all_digits, key=len) if len(all_digits) > 1 else all_digits[0]
-#             else:
-#                 return "No numerical score found in the response."
-
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-#         return None
-
-# if __name__ == "__main__":
-#     image_file = 'game_screenshot.png' # Ensure this matches your file name
-#     score = read_game_score(image_file)
-
-#     if score is not None:
-#         print(f"\nExtracted Score: {score}")
-#     else:
-#         print("Failed to extract score.")
